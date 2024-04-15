@@ -14,7 +14,25 @@ function rollWithParams(params) {
     rollResults + "\n";
 }
 
-// eslint-disable-next-line max-statements, max-lines-per-function
+function respond200(req, res) {
+  let method = req.method;
+  let path = req.url;
+  let params = new URL(path, `http://${req.headers.host}`).searchParams;
+
+  res.statusCode = 200;
+  res.setHeader("Content-Type", "text/plain");
+  res.write(`${rollWithParams(params)}\n`);
+  res.write(`${method} ${path}`);
+  res.end();
+}
+
+function respond404(_, res) {
+  res.statusCode = 404;
+  res.setHeader("Content-Type", "text/plain");
+  res.write("Not found!");
+  res.end();
+}
+
 const SERVER = HTTP.createServer((req, res) => {
   let method = req.method;
   let path = req.url;
@@ -23,18 +41,11 @@ const SERVER = HTTP.createServer((req, res) => {
   console.log({method, path, params});
 
   if (path === "/favicon.ico") {
-    res.statusCode = 404;
-    res.setHeader("Content-Type", "text/plain");
-    res.write("Not found!");
-    res.end();
+    respond404(req, res);
     return;
   }
 
-  res.statusCode = 200;
-  res.setHeader("Content-Type", "text/plain");
-  res.write(`${rollWithParams(params)}\n`);
-  res.write(`${method} ${path}`);
-  res.end();
+  respond200(req, res);
 });
 
 SERVER.listen(PORT, "localhost", () => {
