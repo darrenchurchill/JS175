@@ -12,6 +12,23 @@ const DEFAULT_APR = 5; // percent
 const DEFAULT_LOAN_AMOUNT = 5000; // dollars
 const DEFAULT_LOAN_DURATION_YEARS = 10;
 
+const HTML_START = `
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Loan Calculator</title>
+  </head>
+  <body>
+    <article>
+      <h1>Loan Calculator</h1>
+`;
+
+const HTML_END = `
+    </article>
+  </body>
+</html>`;
+
 function getNum(value, defaultValue) {
   let number = Number(value);
   if (value === null || Number.isNaN(number)) return defaultValue;
@@ -26,22 +43,38 @@ function calcLoanWithParams(params) {
 
   return (
   // eslint-disable-next-line indent
-`Amount: $${amount}
-Duration: ${duration} year${duration > 1 ? "s" : ""}
-APR: ${DEFAULT_APR.toFixed(2)}%
-Monthly Payment: $${pmt.toFixed(2)}\n`
+`<table>
+  <tbody>
+    <tr>
+      <th>Amount:</th>
+      <td>$${amount.toFixed(2)}</td>
+    </tr>
+    <tr>
+      <th>Duration:</th>
+      <td>${duration} year${duration > 1 ? "s" : ""}</td>
+    </tr>
+    <tr>
+      <th>APR:</th>
+      <td>${DEFAULT_APR.toFixed(2)}%</td>
+    </tr>
+    <tr>
+      <th>Monthly payment:</th>
+      <td>$${pmt.toFixed(2)}</td>
+    </tr>
+  </tbody>
+</table>`
   );
 }
 
 function respond200(req, res) {
-  let method = req.method;
   let path = req.url;
   let params = new URL(path, `http://${req.headers.host}`).searchParams;
 
   res.statusCode = 200;
-  res.setHeader("Content-Type", "text/plain");
+  res.setHeader("Content-Type", "text/html");
+  res.write(HTML_START);
   res.write(`${calcLoanWithParams(params)}\n`);
-  res.write(`${method} ${path}`);
+  res.write(HTML_END);
   res.end();
 }
 
