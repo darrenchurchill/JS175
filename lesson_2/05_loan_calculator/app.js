@@ -3,8 +3,12 @@
  * Assignment 5: Loan Calculator App
  * app.js
  */
+const fs = require("fs");
 const HTTP = require("http");
 const URL = require("url").URL;
+
+const HANDLEBARS = require("handlebars");
+
 const calcLoan = require("./loan_calc");
 const PORT = 8080;
 
@@ -12,103 +16,28 @@ const DEFAULT_APR = 5; // percent
 const DEFAULT_LOAN_AMOUNT = 5000; // dollars
 const DEFAULT_LOAN_DURATION_YEARS = 10;
 
-const HTML_START = `
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>Loan Calculator</title>
-    <style type="text/css">
-      body {
-        background: rgba(250, 250, 250);
-        font-family: sans-serif;
-        color: rgb(50, 50, 50);
-      }
-
-      article {
-        width: 100%;
-        max-width: 40rem;
-        margin: 0 auto;
-        padding: 1rem 2rem;
-      }
-
-      h1 {
-        font-size: 2.5rem;
-        text-align: center;
-      }
-
-      table {
-        font-size: 2rem;
-      }
-
-      th {
-        text-align: right;
-      }
-
-      td {
-        text-align: center;
-      }
-    </style>
-  </head>
-  <body>
-    <article>
-      <h1>Loan Calculator</h1>
-`;
-
-const HTML_END = `
-    </article>
-  </body>
-</html>`;
+const template = HANDLEBARS.compile(
+  fs.readFileSync(`${__dirname}/loan_calc.handlebars`).toString()
+);
+HANDLEBARS.registerHelper("toFixed2", (string) => Number(string).toFixed(2));
+HANDLEBARS.registerHelper("add", (a, b) => a + b);
+HANDLEBARS.registerHelper("subtract", (a, b) => a - b);
 
 // eslint-disable-next-line max-lines-per-function
 function generateContent({amount, duration, apr, pmt}) {
   const AMOUNT_DELTA = 100;
   const DURATION_DELTA = 1;
 
-  return (
-  // eslint-disable-next-line indent
-`${HTML_START}
-<table>
-  <tbody>
-    <tr>
-      <th>Amount:</th>
-      <td>
-        <a href="/?amount=${amount - AMOUNT_DELTA}&duration=${duration}">
-          - $${AMOUNT_DELTA}
-        </a>
-      </td>
-      <td>$${amount.toFixed(2)}</td>
-      <td>
-        <a href="/?amount=${amount + AMOUNT_DELTA}&duration=${duration}">
-          + $${AMOUNT_DELTA}
-        </a>
-      </td>
-    </tr>
-    <tr>
-      <th>Duration:</th>
-      <td>
-        <a href="/?amount=${amount}&duration=${duration - DURATION_DELTA}">
-          - $${DURATION_DELTA}
-        </a>
-      </td>
-      <td>${duration} year${duration > 1 ? "s" : ""}</td>
-      <td>
-        <a href="/?amount=${amount}&duration=${duration + DURATION_DELTA}">
-          + $${DURATION_DELTA}
-        </a>
-      </td>
-    </tr>
-    <tr>
-      <th>APR:</th>
-      <td colspan="3">${apr.toFixed(2)}%</td>
-    </tr>
-    <tr>
-      <th>Monthly payment:</th>
-      <td colspan="3">$${pmt.toFixed(2)}</td>
-    </tr>
-  </tbody>
-</table>
-${HTML_END}`
+  return template(
+    {
+      amount,
+      duration,
+      isPlural: duration !== 1,
+      apr,
+      pmt,
+      amountDelta: AMOUNT_DELTA,
+      durationDelta: DURATION_DELTA,
+    }
   );
 }
 

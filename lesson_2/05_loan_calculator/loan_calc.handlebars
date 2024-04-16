@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Loan Calculator</title>
+  <style type="text/css">
+    body {
+      background: rgba(250, 250, 250);
+      font-family: sans-serif;
+      color: rgb(50, 50, 50);
+    }
+
+    article {
+      width: 100%;
+      max-width: 40rem;
+      margin: 0 auto;
+      padding: 1rem 2rem;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      text-align: center;
+    }
+
+    table {
+      font-size: 2rem;
+    }
+
+    th {
+      text-align: right;
+    }
+
+    td {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <article>
+    <h1>Loan Calculator</h1>
+    <table>
+      <tbody>
+          <tr>
+            <th>Amount:</th>
+            <td>
+              <a href="/?amount={{subtract amount amountDelta}}&duration={{duration}}">
+              - ${{amountDelta}}
+              </a>
+            </td>
+            <td>${{toFixed2 amount}}</td>
+            <td>
+              <a href="/?amount={{add amount amountDelta}}&duration={{duration}}">
+              + ${{amountDelta}}
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <th>Duration:</th>
+            <td>
+              <a href="/?amount={{amount}}&duration={{subtract duration durationDelta}}">
+              - {{durationDelta}}
+              </a>
+            </td>
+            <td>{{duration}} year{{#isPlural}}s{{/isPlural}}</td>
+            <td>
+              <a href="/?amount={{amount}}&duration={{add duration durationDelta}}">
+              + {{durationDelta}}
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <th>APR:</th>
+            <td colspan="3">{{toFixed2 apr}}%</td>
+          </tr>
+          <tr>
+            <th>Monthly payment:</th>
+            <td colspan="3">${{toFixed2 pmt}}</td>
+          </tr>
+      </tbody>
+    </table>
+  </article>
+</body>
+</html>
