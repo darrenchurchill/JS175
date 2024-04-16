@@ -6,6 +6,7 @@
 const fs = require("fs");
 const HTTP = require("http");
 const URL = require("url").URL;
+const QUERYSTRING = require("querystring");
 
 const HANDLEBARS = require("handlebars");
 
@@ -70,8 +71,8 @@ function getNum(value, defaultValue) {
 }
 
 function calcLoanOfferData(params) {
-  let amount = getNum(params.get("amount"), DEFAULT_LOAN_AMOUNT);
-  let duration = getNum(params.get("duration"), DEFAULT_LOAN_DURATION_YEARS);
+  let amount = getNum(params["amount"], DEFAULT_LOAN_AMOUNT);
+  let duration = getNum(params["duration"], DEFAULT_LOAN_DURATION_YEARS);
   let pmt = calcLoan(amount, DEFAULT_APR / 100, duration);
 
   return {amount, duration, apr: DEFAULT_APR, pmt};
@@ -109,13 +110,13 @@ function serveStatic(req, res) {
   respond200(req, res, type, () => asset.toString());
 }
 
-// eslint-disable-next-line max-lines-per-function
+// eslint-disable-next-line max-lines-per-function, max-statements
 const SERVER = HTTP.createServer((req, res) => {
   let method = req.method;
   let url = new URL(req.url, `http://${req.headers.host}`);
 
   let path = url.pathname;
-  let params = url.searchParams;
+  let params = QUERYSTRING.parse(url.search.substring(1));
 
   console.log({method, path, params});
 
@@ -124,13 +125,28 @@ const SERVER = HTTP.createServer((req, res) => {
     return;
   }
   if (path === LOAN_OFFER_PATH) {
-    respond200(req, res, "text/html", () =>
-      generateContentLoanOffer({
-        loanOfferPath: LOAN_OFFER_PATH,
-        ...calcLoanOfferData(params),
-      })
-    );
-    return;
+    if (method === "GET") {
+      respond200(req, res, "text/html", () =>
+        generateContentLoanOffer({
+          loanOfferPath: LOAN_OFFER_PATH,
+          ...calcLoanOfferData(params),
+        })
+      );
+      return;
+    }
+    if (method === "POST") {
+      req
+        .reduce((body, chunk) => body + chunk.toString(), "")
+        .then((body) =>
+          respond200(req, res, "text/html", () =>
+            generateContentLoanOffer({
+              loanOfferPath: LOAN_OFFER_PATH,
+              ...calcLoanOfferData(QUERYSTRING.parse(body))
+            })
+          ))
+        .catch((error) => { console.log(error) });
+      return;
+    }
   }
   if (path.match(/^\/assets/)) {
     serveStatic(req, res);
