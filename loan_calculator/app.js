@@ -77,9 +77,9 @@ function calcLoanOfferData(params) {
   return {amount, duration, apr: DEFAULT_APR, pmt};
 }
 
-function respond200(_, res, writeCallback) {
+function respond200(_, res, contentType, writeCallback) {
   res.statusCode = 200;
-  res.setHeader("Content-Type", "text/html");
+  res.setHeader("Content-Type", contentType);
   res.write(`${writeCallback()}\n`);
   res.end();
 }
@@ -89,6 +89,24 @@ function respond404(_, res) {
   res.setHeader("Content-Type", "text/plain");
   res.write("Not found!");
   res.end();
+}
+
+function serveStatic(req, res) {
+  let path = new URL(req.url, `http://${req.headers.host}`).pathname;
+  let asset;
+
+  try {
+    asset = fs.readFileSync(`${__dirname}/public${path}`);
+  } catch (error) {
+    console.log(error);
+    respond404(req, res);
+    return;
+  }
+
+  let type = "";
+  if (path.match(/\/assets\/styles/)) type = "text/css";
+
+  respond200(req, res, type, () => asset.toString());
 }
 
 // eslint-disable-next-line max-lines-per-function
@@ -102,16 +120,20 @@ const SERVER = HTTP.createServer((req, res) => {
   console.log({method, path, params});
 
   if (path === "/") {
-    respond200(req, res, () => generateContentLoanCalc());
+    respond200(req, res, "text/html", () => generateContentLoanCalc());
     return;
   }
   if (path === LOAN_OFFER_PATH) {
-    respond200(req, res, () =>
+    respond200(req, res, "text/html", () =>
       generateContentLoanOffer({
         loanOfferPath: LOAN_OFFER_PATH,
         ...calcLoanOfferData(params),
       })
     );
+    return;
+  }
+  if (path.match(/^\/assets/)) {
+    serveStatic(req, res);
     return;
   }
 
