@@ -1,6 +1,6 @@
 /**
- * JS175 Lesson 2
- * Assignment 5: Loan Calculator App
+ * JS175 Lesson 2-4
+ * Loan Calculator App
  * loan_calc.js
  */
 function calculateMonthlyPmt(loanAmt, APR, loanYrs, loanMonths = 0) {
