@@ -56,21 +56,13 @@ const HTML_END = `
   </body>
 </html>`;
 
-function getNum(value, defaultValue) {
-  let number = Number(value);
-  if (value === null || Number.isNaN(number)) return defaultValue;
-  return number;
-}
-
 // eslint-disable-next-line max-lines-per-function
-function calcLoanWithParams(params) {
-  let amount = getNum(params.get("amount"), DEFAULT_LOAN_AMOUNT);
-  let duration = getNum(params.get("duration"), DEFAULT_LOAN_DURATION_YEARS);
-  let pmt = calcLoan(amount, DEFAULT_APR / 100, duration);
+function generateContent({amount, duration, apr, pmt}) {
 
   return (
   // eslint-disable-next-line indent
-`<table>
+`${HTML_START}
+<table>
   <tbody>
     <tr>
       <th>Amount:</th>
@@ -89,8 +81,23 @@ function calcLoanWithParams(params) {
       <td>$${pmt.toFixed(2)}</td>
     </tr>
   </tbody>
-</table>`
+</table>
+${HTML_END}`
   );
+}
+
+function getNum(value, defaultValue) {
+  let number = Number(value);
+  if (value === null || Number.isNaN(number)) return defaultValue;
+  return number;
+}
+
+function calcLoanWithParams(params) {
+  let amount = getNum(params.get("amount"), DEFAULT_LOAN_AMOUNT);
+  let duration = getNum(params.get("duration"), DEFAULT_LOAN_DURATION_YEARS);
+  let pmt = calcLoan(amount, DEFAULT_APR / 100, duration);
+
+  return {amount, duration, apr: DEFAULT_APR, pmt};
 }
 
 function respond200(req, res) {
@@ -99,9 +106,7 @@ function respond200(req, res) {
 
   res.statusCode = 200;
   res.setHeader("Content-Type", "text/html");
-  res.write(HTML_START);
-  res.write(`${calcLoanWithParams(params)}\n`);
-  res.write(HTML_END);
+  res.write(`${generateContent(calcLoanWithParams(params))}\n`);
   res.end();
 }
 
