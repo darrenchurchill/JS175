@@ -44,6 +44,10 @@ const HTML_START = `
       th {
         text-align: right;
       }
+
+      td {
+        text-align: center;
+      }
     </style>
   </head>
   <body>
@@ -58,6 +62,8 @@ const HTML_END = `
 
 // eslint-disable-next-line max-lines-per-function
 function generateContent({amount, duration, apr, pmt}) {
+  const AMOUNT_DELTA = 100;
+  const DURATION_DELTA = 1;
 
   return (
   // eslint-disable-next-line indent
@@ -66,19 +72,39 @@ function generateContent({amount, duration, apr, pmt}) {
   <tbody>
     <tr>
       <th>Amount:</th>
+      <td>
+        <a href="/?amount=${amount - AMOUNT_DELTA}&duration=${duration}">
+          - $${AMOUNT_DELTA}
+        </a>
+      </td>
       <td>$${amount.toFixed(2)}</td>
+      <td>
+        <a href="/?amount=${amount + AMOUNT_DELTA}&duration=${duration}">
+          + $${AMOUNT_DELTA}
+        </a>
+      </td>
     </tr>
     <tr>
       <th>Duration:</th>
+      <td>
+        <a href="/?amount=${amount}&duration=${duration - DURATION_DELTA}">
+          - $${DURATION_DELTA}
+        </a>
+      </td>
       <td>${duration} year${duration > 1 ? "s" : ""}</td>
+      <td>
+        <a href="/?amount=${amount}&duration=${duration + DURATION_DELTA}">
+          + $${DURATION_DELTA}
+        </a>
+      </td>
     </tr>
     <tr>
       <th>APR:</th>
-      <td>${DEFAULT_APR.toFixed(2)}%</td>
+      <td colspan="3">${apr.toFixed(2)}%</td>
     </tr>
     <tr>
       <th>Monthly payment:</th>
-      <td>$${pmt.toFixed(2)}</td>
+      <td colspan="3">$${pmt.toFixed(2)}</td>
     </tr>
   </tbody>
 </table>
