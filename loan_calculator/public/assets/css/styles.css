@@ -6,7 +6,7 @@ body {
 
 article {
   width: 100%;
-  max-width: 40rem;
+  max-width: 45rem;
   margin: 0 auto;
   padding: 1rem 2rem;
 }
@@ -26,6 +26,11 @@ th {
 
 td {
   text-align: center;
+}
+
+th,
+td {
+  padding: 0.5rem;
 }
 
 form,
