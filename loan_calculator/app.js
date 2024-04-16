@@ -11,25 +11,30 @@ const HANDLEBARS = require("handlebars");
 
 const calcLoan = require("./loan_calc");
 const PORT = 8080;
+const LOAN_OFFER_PATH = "/loan-offer";
 
 const DEFAULT_APR = 5; // percent
 const DEFAULT_LOAN_AMOUNT = 5000; // dollars
 const DEFAULT_LOAN_DURATION_YEARS = 10;
 
-const template = HANDLEBARS.compile(
-  fs.readFileSync(`${__dirname}/loan_calc.handlebars`).toString()
+const templateLoanOffer = HANDLEBARS.compile(
+  fs.readFileSync(`${__dirname}/templates/loan_offer.handlebars`).toString()
 );
+const templateLoanCalc = HANDLEBARS.compile(
+  fs.readFileSync(`${__dirname}/templates/loan_calc.handlebars`).toString()
+);
+
 HANDLEBARS.registerHelper("toFixed2", (string) => Number(string).toFixed(2));
 HANDLEBARS.registerHelper("add", (a, b) => a + b);
 HANDLEBARS.registerHelper("subtract", (a, b) => a - b);
 
-// eslint-disable-next-line max-lines-per-function
-function generateContent({amount, duration, apr, pmt}) {
+function generateContentLoanOffer({loanOfferPath, amount, duration, apr, pmt}) {
   const AMOUNT_DELTA = 100;
   const DURATION_DELTA = 1;
 
-  return template(
+  return templateLoanOffer(
     {
+      loanOfferPath,
       amount,
       duration,
       isPlural: duration !== 1,
@@ -41,13 +46,30 @@ function generateContent({amount, duration, apr, pmt}) {
   );
 }
 
+function generateContentLoanCalc(
+  {
+    loanOfferPath,
+    apr,
+  } = {
+    loanOfferPath: LOAN_OFFER_PATH,
+    apr: DEFAULT_APR
+  }
+) {
+  return templateLoanCalc(
+    {
+      loanOfferPath,
+      apr,
+    }
+  );
+}
+
 function getNum(value, defaultValue) {
   let number = Number(value);
   if (value === null || Number.isNaN(number)) return defaultValue;
   return number;
 }
 
-function calcLoanWithParams(params) {
+function calcLoanOfferData(params) {
   let amount = getNum(params.get("amount"), DEFAULT_LOAN_AMOUNT);
   let duration = getNum(params.get("duration"), DEFAULT_LOAN_DURATION_YEARS);
   let pmt = calcLoan(amount, DEFAULT_APR / 100, duration);
@@ -55,13 +77,10 @@ function calcLoanWithParams(params) {
   return {amount, duration, apr: DEFAULT_APR, pmt};
 }
 
-function respond200(req, res) {
-  let path = req.url;
-  let params = new URL(path, `http://${req.headers.host}`).searchParams;
-
+function respond200(_, res, writeCallback) {
   res.statusCode = 200;
   res.setHeader("Content-Type", "text/html");
-  res.write(`${generateContent(calcLoanWithParams(params))}\n`);
+  res.write(`${writeCallback()}\n`);
   res.end();
 }
 
@@ -72,19 +91,31 @@ function respond404(_, res) {
   res.end();
 }
 
+// eslint-disable-next-line max-lines-per-function
 const SERVER = HTTP.createServer((req, res) => {
   let method = req.method;
-  let path = req.url;
-  let params = new URL(path, `http://${req.headers.host}`).searchParams;
+  let url = new URL(req.url, `http://${req.headers.host}`);
+
+  let path = url.pathname;
+  let params = url.searchParams;
 
   console.log({method, path, params});
 
-  if (path === "/favicon.ico") {
-    respond404(req, res);
+  if (path === "/") {
+    respond200(req, res, () => generateContentLoanCalc());
+    return;
+  }
+  if (path === LOAN_OFFER_PATH) {
+    respond200(req, res, () =>
+      generateContentLoanOffer({
+        loanOfferPath: LOAN_OFFER_PATH,
+        ...calcLoanOfferData(params),
+      })
+    );
     return;
   }
 
-  respond200(req, res);
+  respond404(req, res);
 });
 
 SERVER.listen(PORT, "localhost", () => {

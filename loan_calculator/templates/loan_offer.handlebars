@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Loan Calculator</title>
+  <title>Loan Offer</title>
   <style type="text/css">
     body {
       background: rgba(250, 250, 250);
@@ -43,13 +43,13 @@
           <tr>
             <th>Amount:</th>
             <td>
-              <a href="/?amount={{subtract amount amountDelta}}&duration={{duration}}">
+              <a href="{{loanOfferPath}}?amount={{subtract amount amountDelta}}&duration={{duration}}">
               - ${{amountDelta}}
               </a>
             </td>
             <td>${{toFixed2 amount}}</td>
             <td>
-              <a href="/?amount={{add amount amountDelta}}&duration={{duration}}">
+              <a href="{{loanOfferPath}}?amount={{add amount amountDelta}}&duration={{duration}}">
               + ${{amountDelta}}
               </a>
             </td>
@@ -57,13 +57,13 @@
           <tr>
             <th>Duration:</th>
             <td>
-              <a href="/?amount={{amount}}&duration={{subtract duration durationDelta}}">
+              <a href="{{loanOfferPath}}?amount={{amount}}&duration={{subtract duration durationDelta}}">
               - {{durationDelta}}
               </a>
             </td>
             <td>{{duration}} year{{#isPlural}}s{{/isPlural}}</td>
             <td>
-              <a href="/?amount={{amount}}&duration={{add duration durationDelta}}">
+              <a href="{{loanOfferPath}}?amount={{amount}}&duration={{add duration durationDelta}}">
               + {{durationDelta}}
               </a>
             </td>
