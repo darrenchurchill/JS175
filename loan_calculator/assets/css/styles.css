@@ -27,3 +27,30 @@ th {
 td {
   text-align: center;
 }
+
+form,
+input {
+  font-size: 1.5rem;
+}
+
+form p {
+  text-align: center;
+}
+
+label,
+input {
+  display: block;
+  width: 100%;
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+input[type="submit"] {
+  width: auto;
+  margin: 1rem auto;
+  cursor: pointer;
+  color: #fff;
+  background-color: #01d28e;
+  border: none;
+  border-radius: 0.3rem;
+}
