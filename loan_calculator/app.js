@@ -8,9 +8,13 @@ const HTTP = require("http");
 const URL = require("url").URL;
 const QUERYSTRING = require("querystring");
 
+const FINALHANDLER = require("finalhandler");
 const HANDLEBARS = require("handlebars");
+const ROUTER = require("router");
+const SERVESTATIC = require("serve-static");
 
 const calcLoan = require("./loan_calc");
+
 const PORT = 8080;
 const LOAN_OFFER_PATH = "/loan-offer";
 
@@ -92,11 +96,24 @@ function respond404(_, res) {
   res.end();
 }
 
-function serveIndex(req, res) {
-  respond200(req, res, "text/html", () => generateContentLoanCalc());
-}
+const router = ROUTER();
+router.use((req, _, next) => {
+  let method = req.method;
+  let url = new URL(req.url, `http://${req.headers.host}`);
+  let path = url.pathname;
+  let params = QUERYSTRING.parse(url.search.substring(1));
 
-function serveLoanOfferGet(req, res) {
+  console.log({method, path, params});
+
+  next();
+});
+router.use(SERVESTATIC(`${__dirname}/public`));
+
+router.get("/", (req, res) => {
+  respond200(req, res, "text/html", () => generateContentLoanCalc());
+});
+
+router.get(LOAN_OFFER_PATH, (req, res) => {
   let url = new URL(req.url, `http://${req.headers.host}`);
   let params = QUERYSTRING.parse(url.search.substring(1));
 
@@ -106,9 +123,9 @@ function serveLoanOfferGet(req, res) {
       ...calcLoanOfferData(params),
     })
   );
-}
+});
 
-function serveLoanOfferPost(req, res) {
+router.post(LOAN_OFFER_PATH, (req, res) => {
   req
     .reduce((body, chunk) => body + chunk.toString(), "")
     .then((body) =>
@@ -119,54 +136,12 @@ function serveLoanOfferPost(req, res) {
         })
       ))
     .catch((error) => { console.log(error) });
-}
+});
 
-function serveStatic(req, res) {
-  let path = new URL(req.url, `http://${req.headers.host}`).pathname;
-  let asset;
+router.get("*", (req, res) => respond404(req, res));
 
-  try {
-    asset = fs.readFileSync(`${__dirname}/public${path}`);
-  } catch (error) {
-    console.log(error);
-    respond404(req, res);
-    return;
-  }
-
-  let type = "";
-  if (path.match(/\/assets\/styles/)) type = "text/css";
-
-  respond200(req, res, type, () => asset.toString());
-}
-
-// eslint-disable-next-line max-lines-per-function, max-statements
 const SERVER = HTTP.createServer((req, res) => {
-  let method = req.method;
-  let url = new URL(req.url, `http://${req.headers.host}`);
-
-  let path = url.pathname;
-  let params = QUERYSTRING.parse(url.search.substring(1));
-
-  console.log({method, path, params});
-
-  if (path === "/") {
-    serveIndex(req, res);
-    return;
-  }
-  if (path === LOAN_OFFER_PATH) {
-    if (method === "GET") {
-      serveLoanOfferGet(req, res);
-    } else if (method === "POST") {
-      serveLoanOfferPost(req, res);
-    }
-    return;
-  }
-  if (path.match(/^\/assets/)) {
-    serveStatic(req, res);
-    return;
-  }
-
-  respond404(req, res);
+  router(req, res, FINALHANDLER(req, res));
 });
 
 SERVER.listen(PORT, "localhost", () => {
