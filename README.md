@@ -44,10 +44,14 @@ A webpage echoing the HTTP request in its response message body.
 A webpage performing a series of random die rolls using the URL query parameters
 to set the number of die sides (`sides`) and the number of rolls (`rolls`).
 
-##### `05_loan_calculator/`
+#### Projects
+
+##### `loan_calculator`
+
+`npm run loan_calculator`
 
 - `app.js`
 - `loan_calc.js`
 
-A webpage calculating a monthly loan payment using URL query parameters to set
-the loan amount (`amount`) and loan duration in years (`duration`).
+A webpage calculating a monthly loan payment using `POST` and `GET` methods to
+specify the loan amount (`amount`) and loan duration in years (`duration`).
