@@ -1,4 +1,10 @@
 {
+  "name": "js175",
+  "description": "JS175: Networked Applications with JavaScript",
+  "version": "0.0.1",
+  "main": "index.js",
+  "author": "Darren Churchill",
+  "license": "ISC",
   "devDependencies": {
     "@babel/core": "^7.24.0",
     "@babel/eslint-parser": "^7.23.10",
