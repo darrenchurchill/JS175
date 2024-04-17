@@ -92,6 +92,35 @@ function respond404(_, res) {
   res.end();
 }
 
+function serveIndex(req, res) {
+  respond200(req, res, "text/html", () => generateContentLoanCalc());
+}
+
+function serveLoanOfferGet(req, res) {
+  let url = new URL(req.url, `http://${req.headers.host}`);
+  let params = QUERYSTRING.parse(url.search.substring(1));
+
+  respond200(req, res, "text/html", () =>
+    generateContentLoanOffer({
+      loanOfferPath: LOAN_OFFER_PATH,
+      ...calcLoanOfferData(params),
+    })
+  );
+}
+
+function serveLoanOfferPost(req, res) {
+  req
+    .reduce((body, chunk) => body + chunk.toString(), "")
+    .then((body) =>
+      respond200(req, res, "text/html", () =>
+        generateContentLoanOffer({
+          loanOfferPath: LOAN_OFFER_PATH,
+          ...calcLoanOfferData(QUERYSTRING.parse(body))
+        })
+      ))
+    .catch((error) => { console.log(error) });
+}
+
 function serveStatic(req, res) {
   let path = new URL(req.url, `http://${req.headers.host}`).pathname;
   let asset;
@@ -121,32 +150,16 @@ const SERVER = HTTP.createServer((req, res) => {
   console.log({method, path, params});
 
   if (path === "/") {
-    respond200(req, res, "text/html", () => generateContentLoanCalc());
+    serveIndex(req, res);
     return;
   }
   if (path === LOAN_OFFER_PATH) {
     if (method === "GET") {
-      respond200(req, res, "text/html", () =>
-        generateContentLoanOffer({
-          loanOfferPath: LOAN_OFFER_PATH,
-          ...calcLoanOfferData(params),
-        })
-      );
-      return;
+      serveLoanOfferGet(req, res);
+    } else if (method === "POST") {
+      serveLoanOfferPost(req, res);
     }
-    if (method === "POST") {
-      req
-        .reduce((body, chunk) => body + chunk.toString(), "")
-        .then((body) =>
-          respond200(req, res, "text/html", () =>
-            generateContentLoanOffer({
-              loanOfferPath: LOAN_OFFER_PATH,
-              ...calcLoanOfferData(QUERYSTRING.parse(body))
-            })
-          ))
-        .catch((error) => { console.log(error) });
-      return;
-    }
+    return;
   }
   if (path.match(/^\/assets/)) {
     serveStatic(req, res);
