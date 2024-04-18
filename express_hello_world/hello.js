@@ -4,7 +4,7 @@
  * hello.js
  */
 const express = require("express");
-const strftime = require("strftime");
+const morgan = require("morgan");
 
 const app = express();
 const PORT = 8080;
@@ -12,26 +12,7 @@ const PORT = 8080;
 app.set("views", "./views");
 app.set("view engine", "pug");
 
-app.use((req, res, next) => {
-  // https://en.wikipedia.org/wiki/Common_Log_Format
-  let msg = [
-    req.ip,
-    "-", // RFC 1413 client identity
-    "-", // userid
-    `[${strftime("%d/%b/%Y:%H:%M:%S %z")}]`,
-    `"${req.method} ${req.path} HTTP/${req.httpVersion}"`,
-  ];
-
-  res.on("finish", () => {
-    console.log(
-      ...msg,
-      res.statusCode,
-      res.getHeader("Content-Length"),
-    );
-  });
-
-  next();
-});
+app.use(morgan("common"));
 
 app.use(express.static("public"));
 
