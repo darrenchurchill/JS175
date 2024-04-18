@@ -1,13 +1,14 @@
-doctype html
+extends layout
 
-html
-  head
-    title This is the page title
-    meta(charset="UTF-8")
-    link(rel="stylesheet" href="/stylesheets/application.css")
-  body
-    header
-      h1 Hello World!
-    main
-      p I'm going to be a software engineer soon!
-      img(src="/images/earth.jpg" alt="The Earth" title="The Earth")
+block title
+  title This is the page title
+
+block nav
+  +nav({english: true})
+
+block content
+  header
+    h1 Hello World!
+  main
+    p I'm going to be a software engineer soon!
+    +earthImg("The Earth", "The Earth")

@@ -1,0 +1,36 @@
+doctype html
+
+mixin nav(current)
+  nav
+    ul
+      li
+        a(href="/english"
+          class=current.english ? "current" : "")
+            img.flag(src="/images/flag-of-United-States-of-America.png"
+                      alt="US Flag"
+                      title="Go to US English site")
+      li
+        a(href="/french"
+          class=current.french ? "current": "")
+            img.flag(src="/images/flag-of-France.png"
+                      alt="Drapeau de la france"
+                      title="Aller sur le site français")
+      li
+        a(href="/serbian"
+          class=current.serbian ? "current" : "")
+            img.flag(src="/images/flag-of-Serbia.png"
+                      alt="Застава Србије"
+                      title="Идите на српски сајт")
+
+mixin earthImg(alt, title)
+  img(src="/images/earth.jpg", alt=alt, title=title)
+
+html
+  head
+    block title
+    meta(charset="UTF-8")
+    link(rel="stylesheet", href="/stylesheets/application.css")
+
+  body
+    block nav
+    block content
