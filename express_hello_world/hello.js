@@ -7,8 +7,11 @@ const express = require("express");
 const app = express();
 const PORT = 8080;
 
+app.set("views", "./views");
+app.set("view engine", "pug");
+
 app.get("/", (req, res) => {
-  res.send("Hello Worlds!\n");
+  res.render("hello-world");
 });
 
 app.listen(PORT, "localhost", () => {
