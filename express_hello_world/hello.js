@@ -12,8 +12,20 @@ app.set("view engine", "pug");
 
 app.use(express.static("public"));
 
-app.get("/", (req, res) => {
-  res.render("hello-world");
+app.get("/", (_req, res) => {
+  res.redirect("/english");
+});
+
+app.get("/english", (_req, res) => {
+  res.render("hello-world-english");
+});
+
+app.get("/french", (_req, res) => {
+  res.render("hello-world-french");
+});
+
+app.get("/serbian", (_req, res) => {
+  res.render("hello-world-serbian");
 });
 
 app.listen(PORT, "localhost", () => {
