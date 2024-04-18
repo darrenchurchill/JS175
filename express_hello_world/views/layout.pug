@@ -33,12 +33,20 @@ mixin nav(current)
 mixin earthImg(alt, title)
   img(src="/images/earth.jpg", alt=alt, title=title)
 
-html
-  head
-    block title
-    meta(charset="UTF-8")
-    link(rel="stylesheet", href="/stylesheets/application.css")
+<html lang=
 
-  body
-    block nav
-    block content
+block lang
+  | "en-US"
+
+| >
+
+head
+  block title
+  meta(charset="UTF-8")
+  link(rel="stylesheet", href="/stylesheets/application.css")
+
+body
+  block nav
+  block content
+
+</html>
