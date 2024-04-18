@@ -1,26 +1,34 @@
 doctype html
 
+mixin navli(href, isCurrent, imgSrc, imgAlt, imgTitle)
+  li
+    a(href=href class=isCurrent ? "current" : "")
+      img.flag(src=imgSrc, alt=imgAlt, title=imgTitle)
+
 mixin nav(current)
   nav
     ul
-      li
-        a(href="/english"
-          class=current.english ? "current" : "")
-            img.flag(src="/images/flag-of-United-States-of-America.png"
-                      alt="US Flag"
-                      title="Go to US English site")
-      li
-        a(href="/french"
-          class=current.french ? "current": "")
-            img.flag(src="/images/flag-of-France.png"
-                      alt="Drapeau de la france"
-                      title="Aller sur le site français")
-      li
-        a(href="/serbian"
-          class=current.serbian ? "current" : "")
-            img.flag(src="/images/flag-of-Serbia.png"
-                      alt="Застава Србије"
-                      title="Идите на српски сајт")
+      +navli(
+        "/english",
+        current.english,
+        "/images/flag-of-United-States-of-America.png",
+        "US Flag",
+        "Go to US English site"
+      )
+      +navli(
+        "/french",
+        current.french,
+        "/images/flag-of-France.png",
+        "Drapeau de la france",
+        "Aller sur le site français"
+      )
+      +navli(
+        "/serbian",
+        current.serbian,
+        "/images/flag-of-Serbia.png",
+        "Застава Србије",
+        "Идите на српски сајт"
+      )
 
 mixin earthImg(alt, title)
   img(src="/images/earth.jpg", alt=alt, title=title)
