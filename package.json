@@ -3,5 +3,8 @@
     "@babel/core": "^7.24.0",
     "@babel/eslint-parser": "^7.23.10",
     "eslint": "^8.57.0"
+  },
+  "scripts": {
+    "simple-echo-server": "pushd lesson_2/02_simple_echo_server; node app.js; popd"
   }
 }
