@@ -15,8 +15,17 @@ Clone repository and run `npm install` to install dependencies.
 
 ### Execution
 
-To start any of the web servers, run the `app.js` file with `node`. Only run
-one server at a time, they all listen on the same port.
+> [!NOTE]
+> Only run one server at a time, they all listen on the same port.
+
+To start any of the web servers, either:
+
+Use `npm run <script-name>` to use one of the `scripts` from `package.json`. See
+the sections below or look in `package.json` for the script names.
+
+OR
+
+run the `app.js` file with `node`.
 
 ```shell
 node <**/app.js>
