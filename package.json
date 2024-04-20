@@ -13,6 +13,7 @@
   },
   "scripts": {
     "dice-rolling-app": "pushd lesson_2/03_dice_rolling_app; node app.js; popd",
+    "loan-calculator": "pushd loan_calculator; node app.js; popd",
     "simple-echo-server": "pushd lesson_2/02_simple_echo_server; node app.js; popd"
   }
 }
